@@ -1,56 +1,87 @@
 import React, { useState } from 'react';
-import { Terminal, Database, Home, Settings, User } from 'lucide-react';
+import { Terminal, Database, Home, Settings, User, LogOut, Crown } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginScreen } from './components/LoginScreen';
+import { AdminDashboard } from './components/AdminDashboard';
 import { Dashboard } from './components/Dashboard';
 import { LoreGrid } from './components/LoreGrid';
 import { Terminal as TerminalComponent } from './components/Terminal';
 import { LoreModal } from './components/LoreModal';
 import { LoreEntry } from './data/loreDatabase';
 
-type View = 'dashboard' | 'database' | 'terminal' | 'settings';
+type View = 'dashboard' | 'database' | 'terminal' | 'settings' | 'admin';
 
-function App() {
+function AppContent() {
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [userClearance, setUserClearance] = useState<'Beta' | 'Alpha' | 'Omega'>('Beta');
   const [selectedEntry, setSelectedEntry] = useState<LoreEntry | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="text-white">Initializing Theseus Terminal...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return <LoginScreen />;
+  }
 
   const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'database', label: 'Database', icon: Database },
     { id: 'terminal', label: 'Terminal', icon: Terminal },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'settings', label: 'Settings', icon: Settings },
+    ...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Crown }] : [])
   ];
 
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard userClearance={userClearance} />;
+        return <Dashboard userClearance={user.clearanceLevel} />;
       case 'database':
-        return <LoreGrid userClearance={userClearance} onEntrySelect={setSelectedEntry} />;
+        return <LoreGrid userClearance={user.clearanceLevel} onEntrySelect={setSelectedEntry} />;
       case 'terminal':
-        return <TerminalComponent userClearance={userClearance} />;
+        return <TerminalComponent userClearance={user.clearanceLevel} />;
+      case 'admin':
+        return user.role === 'admin' ? <AdminDashboard /> : <Dashboard userClearance={user.clearanceLevel} />;
       case 'settings':
         return (
           <div className="space-y-6">
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-white mb-4">User Settings</h2>
+              <h2 className="text-xl font-bold text-white mb-4">Operative Profile</h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Clearance Level
-                  </label>
-                  <select
-                    value={userClearance}
-                    onChange={(e) => setUserClearance(e.target.value as 'Beta' | 'Alpha' | 'Omega')}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400"
-                  >
-                    <option value="Beta">Beta - Standard Access</option>
-                    <option value="Alpha">Alpha - Classified Access</option>
-                    <option value="Omega">Omega - Unrestricted Access</option>
-                  </select>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Simulates different clearance levels for testing purposes
-                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Display Name</label>
+                      <div className="text-white">{user.displayName}</div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Operative ID</label>
+                      <div className="text-white font-mono">@{user.username}</div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Clearance Level</label>
+                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border ${
+                        user.clearanceLevel === 'Omega' ? 'text-red-400 bg-red-400/10 border-red-400/20' :
+                        user.clearanceLevel === 'Alpha' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' :
+                        'text-blue-400 bg-blue-400/10 border-blue-400/20'
+                      }`}>
+                        {user.clearanceLevel === 'Omega' && <Crown className="w-4 h-4" />}
+                        {user.clearanceLevel}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Join Date</label>
+                      <div className="text-white">{new Date(user.joinDate).toLocaleDateString()}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -59,7 +90,7 @@ function App() {
               <h3 className="text-lg font-semibold text-white mb-3">About Theseus Terminal</h3>
               <p className="text-gray-300 text-sm leading-relaxed">
                 The Theseus Terminal is an interactive lore compendium for your campaign universe. 
-                Players can explore the rich history of corporations, star systems, AI entities, and 
+                Operatives can explore the rich history of corporations, star systems, AI entities, and 
                 classified projects through an immersive terminal interface. Access to information 
                 is controlled by clearance levels, creating a sense of progression and discovery.
               </p>
@@ -67,7 +98,7 @@ function App() {
           </div>
         );
       default:
-        return <Dashboard userClearance={userClearance} />;
+        return <Dashboard userClearance={user.clearanceLevel} />;
     }
   };
 
@@ -88,17 +119,26 @@ function App() {
           
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-sm font-medium">Operative</div>
+              <div className="text-sm font-medium">{user.displayName}</div>
               <div className={`text-xs ${
-                userClearance === 'Omega' ? 'text-red-400' :
-                userClearance === 'Alpha' ? 'text-yellow-400' :
+                user.clearanceLevel === 'Omega' ? 'text-red-400' :
+                user.clearanceLevel === 'Alpha' ? 'text-yellow-400' :
                 'text-blue-400'
               }`}>
-                Clearance: {userClearance}
+                Clearance: {user.clearanceLevel}
               </div>
             </div>
-            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-sm">
+                {user.avatar || <User className="w-4 h-4" />}
+              </div>
+              <button
+                onClick={logout}
+                className="text-gray-400 hover:text-red-400 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -131,7 +171,7 @@ function App() {
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
           {currentView === 'terminal' ? (
-            <TerminalComponent userClearance={userClearance} />
+            <TerminalComponent userClearance={user.clearanceLevel} />
           ) : (
             <div className="h-full overflow-y-auto p-6">
               {renderContent()}
@@ -143,10 +183,18 @@ function App() {
       {/* Lore Modal */}
       <LoreModal
         entry={selectedEntry}
-        userClearance={userClearance}
+        userClearance={user.clearanceLevel}
         onClose={() => setSelectedEntry(null)}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
