@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Database, Home, Settings, User, LogOut, Crown } from 'lucide-react';
+import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -7,9 +7,14 @@ import { Dashboard } from './components/Dashboard';
 import { LoreGrid } from './components/LoreGrid';
 import { Terminal as TerminalComponent } from './components/Terminal';
 import { LoreModal } from './components/LoreModal';
+import { MissionBoard } from './components/MissionBoard';
+import { StarMap } from './components/StarMap';
+import { NPCDatabase } from './components/NPCDatabase';
+import { SessionNotes } from './components/SessionNotes';
+import { CommunicationHub } from './components/CommunicationHub';
 import { LoreEntry } from './data/loreDatabase';
 
-type View = 'dashboard' | 'database' | 'terminal' | 'settings' | 'admin';
+type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' | 'admin';
 
 function AppContent() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -34,7 +39,12 @@ function AppContent() {
   const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'database', label: 'Database', icon: Database },
+    { id: 'missions', label: 'Missions', icon: Target },
+    { id: 'starmap', label: 'Star Map', icon: Star },
+    { id: 'npcs', label: 'NPCs', icon: Users },
+    { id: 'communications', label: 'Comms', icon: MessageSquare },
     { id: 'terminal', label: 'Terminal', icon: Terminal },
+    ...(user.role === 'admin' ? [{ id: 'sessions', label: 'Sessions', icon: FileText }] : []),
     { id: 'settings', label: 'Settings', icon: Settings },
     ...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Crown }] : [])
   ];
@@ -47,6 +57,16 @@ function AppContent() {
         return <LoreGrid userClearance={user.clearanceLevel} onEntrySelect={setSelectedEntry} />;
       case 'terminal':
         return <TerminalComponent userClearance={user.clearanceLevel} />;
+      case 'missions':
+        return <MissionBoard userClearance={user.clearanceLevel} />;
+      case 'starmap':
+        return <StarMap userClearance={user.clearanceLevel} />;
+      case 'npcs':
+        return <NPCDatabase userClearance={user.clearanceLevel} />;
+      case 'sessions':
+        return <SessionNotes />;
+      case 'communications':
+        return <CommunicationHub userClearance={user.clearanceLevel} />;
       case 'admin':
         return user.role === 'admin' ? <AdminDashboard /> : <Dashboard userClearance={user.clearanceLevel} />;
       case 'settings':
