@@ -16,6 +16,7 @@ import {
   Save,
   X
 } from 'lucide-react';
+import { Edit3 } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, User as DBUser } from '../lib/supabase';
 
