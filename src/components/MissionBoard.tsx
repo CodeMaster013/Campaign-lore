@@ -217,28 +217,29 @@ export const MissionBoard: React.FC<MissionBoardProps> = ({ userClearance }) => 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Mission Board</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Mission Board</h2>
           <p className="text-gray-400">Active operations and completed missions</p>
         </div>
         {user?.role === 'admin' && (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            New Mission
+            <span className="hidden sm:inline">New Mission</span>
+            <span className="sm:hidden">New</span>
           </button>
         )}
       </div>
 
       {/* Status Filter */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2">
           {['active', 'completed', 'failed', 'archived', 'all'].map(status => (
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors whitespace-nowrap ${
                 selectedStatus === status
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-300 hover:bg-gray-700'
@@ -251,7 +252,7 @@ export const MissionBoard: React.FC<MissionBoardProps> = ({ userClearance }) => 
       </div>
 
       {/* Missions Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {missions.map(mission => (
           <MissionCard key={mission.id} mission={mission} />
         ))}

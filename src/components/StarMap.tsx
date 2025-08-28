@@ -292,38 +292,39 @@ export const StarMap: React.FC<StarMapProps> = ({ userClearance }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Galactic Star Map</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Galactic Star Map</h2>
           <p className="text-gray-400">Interactive map of known star systems</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode(viewMode === '2d' ? '3d' : '2d')}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
+            className="bg-gray-700 hover:bg-gray-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm"
           >
             {viewMode.toUpperCase()} View
           </button>
           {user?.role === 'admin' && (
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              Add System
+              <span className="hidden sm:inline">Add System</span>
+              <span className="sm:hidden">Add</span>
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Star Map */}
         <div className="lg:col-span-2">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
             <canvas
               ref={canvasRef}
               onClick={handleCanvasClick}
-              className="w-full h-96 cursor-crosshair rounded"
+              className="w-full h-64 sm:h-96 cursor-crosshair rounded"
               style={{ background: 'linear-gradient(45deg, #111827, #1f2937)' }}
             />
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
+            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs sm:text-sm text-gray-400 gap-2">
               <div>Click on systems to view details</div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   <span>UL Control</span>
@@ -362,12 +363,12 @@ export const StarMap: React.FC<StarMapProps> = ({ userClearance }) => {
       {/* System List */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-white mb-4">Known Systems</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {systems.filter(system => hasAccess(system.clearance_level)).map(system => (
             <button
               key={system.id}
               onClick={() => setSelectedSystem(system)}
-              className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors touch-manipulation"
             >
               <div className="flex items-center justify-between mb-1">
                 <div className="font-medium text-white">{system.name}</div>

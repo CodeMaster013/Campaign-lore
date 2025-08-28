@@ -325,20 +325,21 @@ export const NPCDatabase: React.FC<NPCDatabaseProps> = ({ userClearance }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">NPC Database</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">NPC Database</h2>
           <p className="text-gray-400">Character profiles and relationship tracking</p>
         </div>
         {user?.role === 'admin' && (
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Add NPC
+            <span className="hidden sm:inline">Add NPC</span>
+            <span className="sm:hidden">Add</span>
           </button>
         )}
       </div>
 
       {/* Search and Filters */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -350,12 +351,12 @@ export const NPCDatabase: React.FC<NPCDatabaseProps> = ({ userClearance }) => {
             />
           </div>
 
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <select
               value={selectedFaction}
               onChange={(e) => setSelectedFaction(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none"
+              className="pl-10 pr-8 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none w-full sm:w-auto"
             >
               <option value="all">All Factions</option>
               {factions.map(faction => (
@@ -364,11 +365,11 @@ export const NPCDatabase: React.FC<NPCDatabaseProps> = ({ userClearance }) => {
             </select>
           </div>
 
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none w-full sm:w-auto"
             >
               <option value="all">All Status</option>
               <option value="alive">Alive</option>
@@ -380,14 +381,14 @@ export const NPCDatabase: React.FC<NPCDatabaseProps> = ({ userClearance }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* NPC List */}
         <div className="lg:col-span-2">
           <div className="text-sm text-gray-400 mb-4">
             Showing {filteredNPCs.length} of {npcs.filter(npc => hasAccess(npc.clearance_level)).length} NPCs
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredNPCs.map(npc => (
               <NPCCard key={npc.id} npc={npc} />
             ))}

@@ -63,7 +63,7 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
     <div className="space-y-6">
       {/* Search and Filters */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -77,12 +77,12 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
           </div>
 
           {/* Category Filter */}
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none"
+              className="pl-10 pr-8 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none w-full sm:w-auto"
             >
               {categories.map(category => (
                 <option key={category.value} value={category.value}>
@@ -93,11 +93,11 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
           </div>
 
           {/* Clearance Filter */}
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <select
               value={selectedClearance}
               onChange={(e) => setSelectedClearance(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400 appearance-none w-full sm:w-auto"
             >
               {clearanceLevels.map(level => (
                 <option key={level.value} value={level.value}>
@@ -116,7 +116,7 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
       </div>
 
       {/* Lore Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredEntries.map(entry => (
           <LoreCard
             key={entry.id}

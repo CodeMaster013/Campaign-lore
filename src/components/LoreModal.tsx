@@ -32,12 +32,12 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-900 border border-gray-700 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
+        <div className="bg-gray-800 border-b border-gray-700 p-3 sm:p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-white">{entry.name}</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white truncate">{entry.name}</h2>
             {!hasAccess && <Lock className="w-5 h-5 text-red-400" />}
           </div>
           <button
@@ -49,7 +49,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(95vh-60px)] sm:max-h-[calc(90vh-80px)]">
           {!hasAccess ? (
             <div className="text-center py-12">
               <Lock className="w-16 h-16 text-red-400 mx-auto mb-4" />
@@ -65,10 +65,10 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
             <div className="space-y-6">
               {/* Classification and Metadata */}
               <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-gray-400 mb-1">Classification</div>
-                    <div className="text-sm font-mono text-green-400">{entry.classification}</div>
+                    <div className="text-xs sm:text-sm font-mono text-green-400 break-words">{entry.classification}</div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-400 mb-1">Clearance Level</div>

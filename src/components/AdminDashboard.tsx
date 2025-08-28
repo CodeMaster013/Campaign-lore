@@ -151,40 +151,40 @@ export const AdminDashboard: React.FC = () => {
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Users className="w-8 h-8 text-blue-400" />
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
             <div>
-              <div className="text-2xl font-bold text-white">{stats.totalUsers}</div>
-              <div className="text-sm text-gray-400">Total Operatives</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalUsers}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Total Operatives</div>
             </div>
           </div>
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Activity className="w-8 h-8 text-green-400" />
+            <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
             <div>
-              <div className="text-2xl font-bold text-white">{stats.activeUsers}</div>
-              <div className="text-sm text-gray-400">Active Now</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">{stats.activeUsers}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Active Now</div>
             </div>
           </div>
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Database className="w-8 h-8 text-purple-400" />
+            <Database className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
             <div>
-              <div className="text-2xl font-bold text-white">{stats.totalEntries}</div>
-              <div className="text-sm text-gray-400">Lore Entries</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalEntries}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Lore Entries</div>
             </div>
           </div>
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-red-400" />
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-red-400" />
             <div>
-              <div className="text-2xl font-bold text-white">{stats.restrictedEntries}</div>
-              <div className="text-sm text-gray-400">Classified</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">{stats.restrictedEntries}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Classified</div>
             </div>
           </div>
         </div>
@@ -267,10 +267,10 @@ export const AdminDashboard: React.FC = () => {
       {showAddUser && (
 
 
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
 
 
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-md">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
 
 
             <div className="flex items-center justify-between mb-4">
@@ -317,7 +317,8 @@ export const AdminDashboard: React.FC = () => {
 
                   type="text"
 
-
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   value={newUser.username}
 
 
@@ -420,7 +421,7 @@ export const AdminDashboard: React.FC = () => {
                   onChange={(e) => setNewUser(prev => ({ ...prev, clearance_level: e.target.value as any }))}
 
 
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400"
+                <div>
 
 
                 >
@@ -457,6 +458,7 @@ export const AdminDashboard: React.FC = () => {
 
 
                   onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value as any }))}
+              </div>
 
 
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-400"
@@ -483,7 +485,7 @@ export const AdminDashboard: React.FC = () => {
             
 
 
-            <div className="flex gap-2 mt-6">
+            <div className="flex flex-col sm:flex-row gap-2 mt-6">
 
 
               <button
@@ -492,7 +494,7 @@ export const AdminDashboard: React.FC = () => {
                 onClick={createUser}
 
 
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 order-2 sm:order-1"
 
 
               >
@@ -513,7 +515,7 @@ export const AdminDashboard: React.FC = () => {
                 onClick={() => setShowAddUser(false)}
 
 
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg order-1 sm:order-2"
 
 
               >
@@ -559,7 +561,8 @@ export const AdminDashboard: React.FC = () => {
         <table className="w-full">
 
           <thead className="bg-gray-700">
-
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px]">
             <tr>
 
               <th className="text-left p-4 text-gray-300">Operative</th>
@@ -594,7 +597,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="text-gray-400 text-sm">@{dbUser.username}</div>
 
 
-                  {dbUser.email && <div className="text-gray-500 text-xs">{dbUser.email}</div>}
+                  {dbUser.email && <div className="text-gray-500 text-xs hidden sm:block">{dbUser.email}</div>}
 
                 </td>
 
@@ -615,7 +618,7 @@ export const AdminDashboard: React.FC = () => {
                       onChange={(e) => updateUserClearance(dbUser.id, e.target.value as any)}
 
 
-                      className={`px-2 py-1 rounded text-xs font-medium border bg-transparent ${getClearanceColor(dbUser.clearance_level)}`}
+                      className={`px-2 py-1 rounded text-xs font-medium border bg-gray-700 ${getClearanceColor(dbUser.clearance_level)}`}
 
 
                     >
@@ -644,7 +647,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className={`w-2 h-2 rounded-full ${dbUser.is_active ? 'bg-green-400' : 'bg-gray-400'}`}></div>
 
 
-                    <span className="text-gray-300 text-sm">{dbUser.is_active ? 'Active' : 'Inactive'}</span>
+                    <span className="text-gray-300 text-xs sm:text-sm">{dbUser.is_active ? 'Active' : 'Inactive'}</span>
 
                   </div>
 
@@ -707,6 +710,7 @@ export const AdminDashboard: React.FC = () => {
                       className="text-gray-400 hover:text-gray-300"
 
 
+        </div>
                       title="View details"
 
 

@@ -230,21 +230,23 @@ Type 'help' for available commands.`;
 
   return (
     <div className="bg-gray-900 text-green-400 font-mono text-sm h-full flex flex-col">
-      <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center gap-2">
+      <div className="bg-gray-800 px-3 sm:px-4 py-2 border-b border-gray-700 flex items-center gap-2">
         <TerminalIcon className="w-4 h-4" />
         <span className="text-green-300">THESEUS TERMINAL</span>
-        <div className="ml-auto flex items-center gap-4">
-          <span className="text-xs text-gray-400">Clearance: {userClearance}</span>
+        <div className="ml-auto flex items-center gap-2 sm:gap-4">
+          <span className="text-xs text-gray-400 hidden sm:inline">Clearance: {userClearance}</span>
+          <span className="text-xs text-gray-400 sm:hidden">{userClearance}</span>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-xs text-green-300">ONLINE</span>
+            <span className="text-xs text-green-300 hidden sm:inline">ONLINE</span>
+            <span className="text-xs text-green-300 sm:hidden">ON</span>
           </div>
         </div>
       </div>
       
       <div 
         ref={terminalRef}
-        className="flex-1 p-4 overflow-y-auto space-y-2"
+        className="flex-1 p-2 sm:p-4 overflow-y-auto space-y-2"
       >
         {history.map((line, index) => (
           <div key={index} className="flex flex-col">
@@ -254,7 +256,7 @@ Type 'help' for available commands.`;
               line.type === 'system' ? 'text-yellow-400' :
               'text-green-300'
             }`}>
-              <pre className="whitespace-pre-wrap font-mono">{line.content}</pre>
+              <pre className="whitespace-pre-wrap font-mono text-xs sm:text-sm break-words">{line.content}</pre>
             </div>
             {line.timestamp && (
               <div className="text-xs text-gray-500 mt-1">
@@ -265,7 +267,7 @@ Type 'help' for available commands.`;
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-gray-700 p-4">
+      <form onSubmit={handleSubmit} className="border-t border-gray-700 p-2 sm:p-4">
         <div className="flex items-center gap-2">
           <span className="text-blue-400">THESEUS:</span>
           <input
@@ -274,7 +276,7 @@ Type 'help' for available commands.`;
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent border-none outline-none text-green-400 font-mono"
+            className="flex-1 bg-transparent border-none outline-none text-green-400 font-mono text-xs sm:text-sm"
             placeholder="Enter command..."
             autoFocus
           />

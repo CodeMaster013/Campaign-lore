@@ -214,16 +214,16 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Communication Hub</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Communication Hub</h2>
           <p className="text-gray-400">Secure communications and message relay</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Channel List */}
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 lg:block">
           <h3 className="text-lg font-semibold text-white mb-4">Channels</h3>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 lg:space-y-2 lg:grid-cols-none">
             {channels.map(channel => {
               const Icon = channel.icon;
               return (
@@ -240,7 +240,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
                     <Icon className="w-4 h-4" />
                     <span className="font-medium">{channel.name}</span>
                   </div>
-                  <div className="text-xs opacity-75">{channel.description}</div>
+                  <div className="text-xs opacity-75 hidden lg:block">{channel.description}</div>
                 </button>
               );
             })}
@@ -248,15 +248,15 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
         </div>
 
         {/* Messages */}
-        <div className="lg:col-span-3 bg-gray-800 border border-gray-700 rounded-lg flex flex-col h-96">
+        <div className="lg:col-span-3 bg-gray-800 border border-gray-700 rounded-lg flex flex-col h-80 sm:h-96">
           {/* Channel Header */}
-          <div className="p-4 border-b border-gray-700">
+          <div className="p-3 sm:p-4 border-b border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-base sm:text-lg font-semibold text-white">
                   {channels.find(c => c.id === selectedChannel)?.name}
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-400">
                   {channels.find(c => c.id === selectedChannel)?.description}
                 </p>
               </div>
@@ -264,7 +264,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
                 <select
                   value={selectedRecipient}
                   onChange={(e) => setSelectedRecipient(e.target.value)}
-                  className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                  className="px-2 sm:px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs sm:text-sm"
                 >
                   <option value="">Select recipient...</option>
                   {users.map(u => (
@@ -276,7 +276,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
             {messages.map(message => (
               <MessageBubble key={message.id} message={message} />
             ))}
@@ -284,18 +284,18 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
           </div>
 
           {/* Message Input */}
-          <div className="p-4 border-t border-gray-700">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="p-3 sm:p-4 border-t border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
               <select
                 value={messageType}
                 onChange={(e) => setMessageType(e.target.value as any)}
-                className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs sm:text-sm w-full sm:w-auto"
               >
                 <option value="text">Standard</option>
                 <option value="encrypted">Encrypted</option>
                 <option value="transmission">Transmission</option>
               </select>
-              <span className={`text-xs ${getClearanceColor(userClearance)}`}>
+              <span className={`text-xs ${getClearanceColor(userClearance)} whitespace-nowrap`}>
                 Clearance: {userClearance}
               </span>
             </div>
@@ -317,9 +317,10 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = ({ userClearanc
               <button
                 onClick={sendMessage}
                 disabled={!newMessage.trim() || (selectedChannel === 'direct' && !selectedRecipient)}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
+                <span className="hidden sm:inline">Send</span>
               </button>
             </div>
           </div>

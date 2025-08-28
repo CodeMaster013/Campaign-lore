@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText } from 'lucide-react';
+import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText, Menu, X } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -20,6 +20,7 @@ function AppContent() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedEntry, setSelectedEntry] = useState<LoreEntry | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,6 +50,10 @@ function AppContent() {
     ...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Crown }] : [])
   ];
 
+  const handleNavClick = (viewId: View) => {
+    setCurrentView(viewId);
+    setSidebarOpen(false); // Close sidebar on mobile after navigation
+  };
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
@@ -77,7 +82,7 @@ function AppContent() {
               
               <div className="space-y-4">
                 <div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Display Name</label>
                       <div className="text-white">{user.displayName}</div>
@@ -125,20 +130,30 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+      <header className="bg-gray-800 border-b border-gray-700 px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden text-gray-400 hover:text-white"
+            >
+              {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
               <Terminal className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-xl font-bold">THESEUS TERMINAL</h1>
               <p className="text-xs text-gray-400">United Laboratories Database Interface</p>
+            </div>
+            <div className="sm:hidden">
+              <h1 className="text-lg font-bold">THESEUS</h1>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <div className="text-sm font-medium">{user.displayName}</div>
               <div className={`text-xs ${
                 user.clearanceLevel === 'Omega' ? 'text-red-400' :
@@ -164,16 +179,38 @@ function AppContent() {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-[calc(100vh-80px)] relative">
         {/* Sidebar */}
-        <nav className="w-64 bg-gray-800 border-r border-gray-700 p-4">
+        <nav className={`${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 p-4 transition-transform duration-300 ease-in-out lg:transition-none`}>
+          {/* Mobile header */}
+          <div className="lg:hidden flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+            <div className="text-sm">
+              <div className="text-white font-medium">{user.displayName}</div>
+              <div className={`text-xs ${
+                user.clearanceLevel === 'Omega' ? 'text-red-400' :
+                user.clearanceLevel === 'Alpha' ? 'text-yellow-400' :
+                'text-blue-400'
+              }`}>
+                {user.clearanceLevel} Clearance
+              </div>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
           <div className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
-                  onClick={() => setCurrentView(item.id as View)}
+                  onClick={() => handleNavClick(item.id as View)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                     currentView === item.id
                       ? 'bg-blue-600 text-white'
@@ -181,19 +218,26 @@ function AppContent() {
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
                 </button>
               );
             })}
           </div>
         </nav>
 
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         {/* Main Content */}
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 overflow-hidden lg:ml-0">
           {currentView === 'terminal' ? (
             <TerminalComponent userClearance={user.clearanceLevel} />
           ) : (
-            <div className="h-full overflow-y-auto p-6">
+            <div className="h-full overflow-y-auto p-4 sm:p-6">
               {renderContent()}
             </div>
           )}

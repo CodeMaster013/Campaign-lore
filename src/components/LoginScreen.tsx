@@ -34,15 +34,15 @@ export const LoginScreen: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-2 sm:p-4">
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
             <Terminal className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">THESEUS TERMINAL</h1>
-          <p className="text-gray-400">United Laboratories Database Interface</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">THESEUS TERMINAL</h1>
+          <p className="text-sm sm:text-base text-gray-400">United Laboratories Database Interface</p>
           <div className="mt-4 text-xs text-gray-500">
             <div className="flex items-center justify-center gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -52,7 +52,7 @@ export const LoginScreen: React.FC = () => {
         </div>
 
         {/* Login Form */}
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -124,7 +124,7 @@ export const LoginScreen: React.FC = () => {
             <AlertCircle className="w-4 h-4 text-yellow-400" />
             Demo Credentials
           </h3>
-          <div className="space-y-2 text-xs">
+          <div className="space-y-2 text-xs overflow-x-auto">
             {demoCredentials.map((cred, index) => (
               <div key={index} className="bg-gray-700 rounded p-2">
                 <div className="flex justify-between items-center mb-1">
@@ -137,7 +137,7 @@ export const LoginScreen: React.FC = () => {
                     {cred.clearance}
                   </span>
                 </div>
-                <div className="text-gray-400">
+                <div className="text-gray-400 break-all">
                   Password: <code className="bg-gray-600 px-1 rounded">{cred.password}</code>
                 </div>
                 <div className="text-gray-500 text-xs mt-1">{cred.role}</div>

@@ -59,45 +59,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ userClearance }) => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Database className="w-8 h-8 text-blue-400" />
+            <Database className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
             <div>
-              <div className="text-2xl font-bold text-white">11</div>
-              <div className="text-sm text-gray-400">Database Entries</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">11</div>
+              <div className="text-xs sm:text-sm text-gray-400">Database Entries</div>
             </div>
           </div>
         </div>
         
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Users className="w-8 h-8 text-green-400" />
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
             <div>
-              <div className="text-2xl font-bold text-white">4</div>
-              <div className="text-sm text-gray-400">Active Factions</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">4</div>
+              <div className="text-xs sm:text-sm text-gray-400">Active Factions</div>
             </div>
           </div>
         </div>
         
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Zap className="w-8 h-8 text-yellow-400" />
+            <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
             <div>
-              <div className="text-2xl font-bold text-white">3</div>
-              <div className="text-sm text-gray-400">Active Projects</div>
+              <div className="text-xl sm:text-2xl font-bold text-white">3</div>
+              <div className="text-xs sm:text-sm text-gray-400">Active Projects</div>
             </div>
           </div>
         </div>
         
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-red-400" />
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-red-400" />
             <div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-xl sm:text-2xl font-bold text-white">
                 {userClearance === 'Omega' ? '0' : userClearance === 'Alpha' ? '2' : '5'}
               </div>
-              <div className="text-sm text-gray-400">Restricted Files</div>
+              <div className="text-xs sm:text-sm text-gray-400">Restricted Files</div>
             </div>
           </div>
         </div>
@@ -106,25 +106,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ userClearance }) => {
       {/* Quick Access */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
         <h2 className="text-xl font-bold text-white mb-4">Quick Access</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg p-4 text-left transition-colors">
             <div className="text-blue-400 font-semibold mb-1">Star Systems</div>
-            <div className="text-sm text-gray-300">Explore galactic territories</div>
+            <div className="text-xs sm:text-sm text-gray-300">Explore galactic territories</div>
           </button>
           
           <button className="bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg p-4 text-left transition-colors">
             <div className="text-orange-400 font-semibold mb-1">Corporations</div>
-            <div className="text-sm text-gray-300">Corporate entities & history</div>
+            <div className="text-xs sm:text-sm text-gray-300">Corporate entities & history</div>
           </button>
           
           <button className="bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg p-4 text-left transition-colors">
             <div className="text-cyan-400 font-semibold mb-1">AI Systems</div>
-            <div className="text-sm text-gray-300">Artificial intelligence profiles</div>
+            <div className="text-xs sm:text-sm text-gray-300">Artificial intelligence profiles</div>
           </button>
           
           <button className="bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg p-4 text-left transition-colors">
             <div className="text-green-400 font-semibold mb-1">Projects</div>
-            <div className="text-sm text-gray-300">Classified operations</div>
+            <div className="text-xs sm:text-sm text-gray-300">Classified operations</div>
           </button>
         </div>
       </div>
