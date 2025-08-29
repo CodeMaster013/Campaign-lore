@@ -14,7 +14,7 @@ const mockUsers: Record<string, { password: string; user: User }> = {
   'founder': {
     password: 'omega-prime-2024',
     user: {
-      id: 'founder-001',
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
       username: 'founder',
       displayName: 'The Founder',
       clearanceLevel: 'Omega',
@@ -27,7 +27,7 @@ const mockUsers: Record<string, { password: string; user: User }> = {
   'operative-alpha': {
     password: 'alpha-clearance',
     user: {
-      id: 'op-001',
+      id: 'b1ffcc88-8d1a-3ff7-aa5c-5aa8ac270b22',
       username: 'operative-alpha',
       displayName: 'Agent Mitchell',
       clearanceLevel: 'Alpha',
@@ -40,7 +40,7 @@ const mockUsers: Record<string, { password: string; user: User }> = {
   'operative-beta': {
     password: 'beta-access',
     user: {
-      id: 'op-002',
+      id: 'c2ddbb77-7e2b-2ee6-bb4b-4bb7bc160c33',
       username: 'operative-beta',
       displayName: 'Operative Chen',
       clearanceLevel: 'Beta',
@@ -53,7 +53,7 @@ const mockUsers: Record<string, { password: string; user: User }> = {
   'recruit': {
     password: 'new-recruit',
     user: {
-      id: 'rec-001',
+      id: 'd3eeaa66-6f3c-1dd5-cc3a-3cc6cb050d44',
       username: 'recruit',
       displayName: 'Recruit Davis',
       clearanceLevel: 'Beta',
