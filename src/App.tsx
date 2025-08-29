@@ -18,6 +18,9 @@ import { Analytics } from "@vercel/analytics/next"
 type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' ;
 
 function AppContent() {
+  <Analytics/>
+  <speedInsights/>
+    
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedEntry, setSelectedEntry] = useState<LoreEntry | null>(null);
