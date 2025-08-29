@@ -19,7 +19,7 @@ type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'np
 
 function AppContent() {
   <Analytics/>
-  <speedInsights/>
+  
     
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
