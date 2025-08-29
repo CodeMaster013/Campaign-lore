@@ -12,6 +12,7 @@ import { NPCDatabase } from './components/NPCDatabase';
 import { SessionNotes } from './components/SessionNotes';
 import { CommunicationHub } from './components/CommunicationHub';
 import { LoreEntry } from './data/loreDatabase';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' ;
 
