@@ -13,6 +13,7 @@ import { SessionNotes } from './components/SessionNotes';
 import { CommunicationHub } from './components/CommunicationHub';
 import { LoreEntry } from './data/loreDatabase';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' ;
 
