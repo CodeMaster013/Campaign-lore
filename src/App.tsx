@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText, Menu, X } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
-import { AdminDashboard } from './components/AdminDashboard';
 import { Dashboard } from './components/Dashboard';
 import { LoreGrid } from './components/LoreGrid';
 import { Terminal as TerminalComponent } from './components/Terminal';
@@ -14,7 +13,7 @@ import { SessionNotes } from './components/SessionNotes';
 import { CommunicationHub } from './components/CommunicationHub';
 import { LoreEntry } from './data/loreDatabase';
 
-type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' | 'admin';
+type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' ;
 
 function AppContent() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -46,8 +45,7 @@ function AppContent() {
     { id: 'communications', label: 'Comms', icon: MessageSquare },
     { id: 'terminal', label: 'Terminal', icon: Terminal },
     ...(user.role === 'admin' ? [{ id: 'sessions', label: 'Sessions', icon: FileText }] : []),
-    { id: 'settings', label: 'Settings', icon: Settings },
-    ...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin Panel', icon: Crown }] : [])
+    { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   const handleNavClick = (viewId: View) => {
@@ -72,8 +70,6 @@ function AppContent() {
         return <SessionNotes />;
       case 'communications':
         return <CommunicationHub userClearance={user.clearanceLevel} />;
-      case 'admin':
-        return user.role === 'admin' ? <AdminDashboard /> : <Dashboard userClearance={user.clearanceLevel} />;
       case 'settings':
         return (
           <div className="space-y-6">
