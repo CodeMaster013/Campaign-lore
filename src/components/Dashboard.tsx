@@ -14,7 +14,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ userClearance }) => {
     "Trade routes through Alpha Centauri experiencing minor delays due to increased security protocols."
   ];
 
-  const randomBriefing = dailyBriefings[Math.floor(Math.random() * dailyBriefings.length)];
+  const [randomBriefing, setRandomBriefing] = React.useState('');
+
+  React.useEffect(() => {
+    setRandomBriefing(dailyBriefings[Math.floor(Math.random() * dailyBriefings.length)]);
+  }, []);
 
   const getAccessLevel = () => {
     switch (userClearance) {
