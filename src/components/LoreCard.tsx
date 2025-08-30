@@ -1,6 +1,22 @@
 import React from 'react';
 import { Lock, AlertTriangle, Info } from 'lucide-react';
-import { LoreEntry } from '../data/loreDatabase';
+
+interface LoreEntry {
+  id: string;
+  entry_id: string;
+  name: string;
+  type: string;
+  clearance_level: 'Beta' | 'Alpha' | 'Omega';
+  classification: string;
+  description: string;
+  details: string[];
+  relations: Record<string, string[]>;
+  status?: string;
+  location?: string;
+  notable: string[];
+  warnings: string[];
+  restricted?: string;
+}
 
 interface LoreCardProps {
   entry: LoreEntry;
@@ -10,7 +26,7 @@ interface LoreCardProps {
 
 export const LoreCard: React.FC<LoreCardProps> = ({ entry, userClearance, onClick }) => {
   const clearanceLevels = { 'Beta': 1, 'Alpha': 2, 'Omega': 3 };
-  const hasAccess = clearanceLevels[userClearance] >= clearanceLevels[entry.clearanceLevel];
+  const hasAccess = clearanceLevels[userClearance] >= clearanceLevels[entry.clearance_level];
 
   const getClearanceColor = (level: string) => {
     switch (level) {
@@ -42,8 +58,8 @@ export const LoreCard: React.FC<LoreCardProps> = ({ entry, userClearance, onClic
           {!hasAccess && <Lock className="w-4 h-4 text-red-400" />}
         </div>
         <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded text-xs font-medium border ${getClearanceColor(entry.clearanceLevel)}`}>
-            {entry.clearanceLevel}
+          <span className={`px-2 py-1 rounded text-xs font-medium border ${getClearanceColor(entry.clearance_level)}`}>
+            {entry.clearance_level}
           </span>
         </div>
       </div>

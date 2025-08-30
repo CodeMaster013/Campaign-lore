@@ -1,17 +1,63 @@
 import React, { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
-import { loreDatabase, searchLore, LoreEntry } from '../data/loreDatabase';
+import { Search, Filter, Plus } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { LoreCard } from './LoreCard';
+import { LoreEntryForm } from './LoreEntryForm';
+
+interface DatabaseLoreEntry {
+  id: string;
+  entry_id: string;
+  name: string;
+  type: string;
+  clearance_level: 'Beta' | 'Alpha' | 'Omega';
+  classification: string;
+  description: string;
+  details: string[];
+  relations: Record<string, string[]>;
+  status?: string;
+  location?: string;
+  notable: string[];
+  warnings: string[];
+  restricted?: string;
+  is_approved: boolean;
+  created_at: string;
+}
 
 interface LoreGridProps {
   userClearance: 'Beta' | 'Alpha' | 'Omega';
-  onEntrySelect: (entry: LoreEntry) => void;
+  onEntrySelect: (entry: DatabaseLoreEntry) => void;
 }
 
 export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect }) => {
+  const { user } = useAuth();
+  const [entries, setEntries] = useState<DatabaseLoreEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedClearance, setSelectedClearance] = useState('all');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  React.useEffect(() => {
+    fetchEntries();
+  }, [userClearance]);
+
+  const fetchEntries = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('lore_entries')
+        .select('*')
+        .eq('is_approved', true)
+        .order('name');
+      
+      if (error) throw error;
+      setEntries(data || []);
+    } catch (error) {
+      console.error('Error fetching lore entries:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -28,12 +74,18 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
     { value: 'Omega', label: 'Omega' }
   ];
 
-  const filterEntries = (): LoreEntry[] => {
-    let entries = Object.values(loreDatabase);
+  const filterEntries = (): DatabaseLoreEntry[] => {
+    let filtered = entries;
 
     // Search filter
     if (searchTerm) {
-      entries = searchLore(searchTerm);
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(entry =>
+        entry.name.toLowerCase().includes(searchLower) ||
+        entry.type.toLowerCase().includes(searchLower) ||
+        entry.description.toLowerCase().includes(searchLower) ||
+        entry.details.some(detail => detail.toLowerCase().includes(searchLower))
+      );
     }
 
     // Category filter
@@ -46,21 +98,45 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
       };
       
       const types = categoryMap[selectedCategory] || [];
-      entries = entries.filter(entry => types.includes(entry.type));
+      filtered = filtered.filter(entry => types.includes(entry.type));
     }
 
     // Clearance filter
     if (selectedClearance !== 'all') {
-      entries = entries.filter(entry => entry.clearanceLevel === selectedClearance);
+      filtered = filtered.filter(entry => entry.clearance_level === selectedClearance);
     }
 
-    return entries;
+    return filtered;
   };
 
   const filteredEntries = filterEntries();
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Lore Database</h2>
+          <p className="text-gray-400">Explore the campaign universe</p>
+        </div>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">Submit Entry</span>
+          <span className="sm:hidden">Submit</span>
+        </button>
+      </div>
+
       {/* Search and Filters */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -111,7 +187,7 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
 
       {/* Results Count */}
       <div className="text-sm text-gray-400">
-        Showing {filteredEntries.length} of {Object.keys(loreDatabase).length} entries
+        Showing {filteredEntries.length} of {entries.length} entries
         {searchTerm && ` for "${searchTerm}"`}
       </div>
 
@@ -119,7 +195,7 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredEntries.map(entry => (
           <LoreCard
-            key={entry.id}
+            key={entry.entry_id}
             entry={entry}
             userClearance={userClearance}
             onClick={() => onEntrySelect(entry)}
@@ -135,6 +211,16 @@ export const LoreGrid: React.FC<LoreGridProps> = ({ userClearance, onEntrySelect
           </div>
         </div>
       )}
+
+      {/* Create Entry Form */}
+      <LoreEntryForm
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        onSubmit={() => {
+          fetchEntries();
+          setShowCreateForm(false);
+        }}
+      />
     </div>
   );
 };
