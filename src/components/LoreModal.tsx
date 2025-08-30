@@ -1,6 +1,22 @@
 import React from 'react';
 import { X, Lock, AlertTriangle, Info, ExternalLink } from 'lucide-react';
-import { LoreEntry } from '../data/loreDatabase';
+
+interface LoreEntry {
+  id: string;
+  entry_id: string;
+  name: string;
+  type: string;
+  clearance_level: 'Beta' | 'Alpha' | 'Omega';
+  classification: string;
+  description: string;
+  details: string[];
+  relations: Record<string, string[]>;
+  status?: string;
+  location?: string;
+  notable: string[];
+  warnings: string[];
+  restricted?: string;
+}
 
 interface LoreModalProps {
   entry: LoreEntry | null;
@@ -12,7 +28,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
   if (!entry) return null;
 
   const clearanceLevels = { 'Beta': 1, 'Alpha': 2, 'Omega': 3 };
-  const hasAccess = clearanceLevels[userClearance] >= clearanceLevels[entry.clearanceLevel];
+  const hasAccess = clearanceLevels[userClearance] >= clearanceLevels[entry.clearance_level];
 
   const getClearanceColor = (level: string) => {
     switch (level) {
@@ -55,7 +71,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
               <Lock className="w-16 h-16 text-red-400 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-red-400 mb-2">ACCESS DENIED</h3>
               <p className="text-gray-400 mb-4">
-                Clearance Level {entry.clearanceLevel} required to access this entry.
+                Clearance Level {entry.clearance_level} required to access this entry.
               </p>
               <p className="text-sm text-gray-500">
                 Your current clearance: {userClearance}
@@ -72,8 +88,8 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
                   </div>
                   <div>
                     <div className="text-sm text-gray-400 mb-1">Clearance Level</div>
-                    <span className={`px-2 py-1 rounded text-xs font-medium border ${getClearanceColor(entry.clearanceLevel)}`}>
-                      {entry.clearanceLevel}
+                    <span className={`px-2 py-1 rounded text-xs font-medium border ${getClearanceColor(entry.clearance_level)}`}>
+                      {entry.clearance_level}
                     </span>
                   </div>
                   <div>
@@ -157,26 +173,18 @@ export const LoreModal: React.FC<LoreModalProps> = ({ entry, userClearance, onCl
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-3">Relations</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {entry.relations.allies && entry.relations.allies.length > 0 && (
-                      <div>
-                        <div className="text-sm text-green-400 font-medium mb-2">Allies</div>
+                    {Object.entries(entry.relations).map(([key, values]) => (
+                      <div key={key}>
+                        <div className="text-sm font-medium mb-2 text-gray-300 capitalize">{key}</div>
                         <ul className="space-y-1">
-                          {entry.relations.allies.map((ally, index) => (
-                            <li key={index} className="text-sm text-gray-300">{ally}</li>
-                          ))}
+                          {Array.isArray(values) ? values.map((value, index) => (
+                            <li key={index} className="text-sm text-gray-300">{value}</li>
+                          )) : (
+                            <li className="text-sm text-gray-300">{values}</li>
+                          )}
                         </ul>
                       </div>
-                    )}
-                    {entry.relations.rivals && entry.relations.rivals.length > 0 && (
-                      <div>
-                        <div className="text-sm text-red-400 font-medium mb-2">Rivals</div>
-                        <ul className="space-y-1">
-                          {entry.relations.rivals.map((rival, index) => (
-                            <li key={index} className="text-sm text-gray-300">{rival}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               )}

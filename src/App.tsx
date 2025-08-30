@@ -6,19 +6,20 @@ import { Dashboard } from './components/Dashboard';
 import { LoreGrid } from './components/LoreGrid';
 import { Terminal as TerminalComponent } from './components/Terminal';
 import { LoreModal } from './components/LoreModal';
+import { LoreApprovalQueue } from './components/LoreApprovalQueue';
 import { MissionBoard } from './components/MissionBoard';
 import { StarMap } from './components/StarMap';
 import { NPCDatabase } from './components/NPCDatabase';
 import { SessionNotes } from './components/SessionNotes';
 import { CommunicationHub } from './components/CommunicationHub';
-import { LoreEntry } from './data/loreDatabase';
+import { AdminDashboard } from './components/AdminDashboard';
 
-type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'settings' ;
+type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'approvals' | 'admin' | 'settings';
 
 function AppContent() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [selectedEntry, setSelectedEntry] = useState<LoreEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isLoading) {
@@ -44,7 +45,11 @@ function AppContent() {
     { id: 'npcs', label: 'NPCs', icon: Users },
     { id: 'communications', label: 'Comms', icon: MessageSquare },
     { id: 'terminal', label: 'Terminal', icon: Terminal },
-    ...(user.role === 'admin' ? [{ id: 'sessions', label: 'Sessions', icon: FileText }] : []),
+    ...(user.role === 'admin' ? [
+      { id: 'sessions', label: 'Sessions', icon: FileText },
+      { id: 'approvals', label: 'Approvals', icon: AlertTriangle },
+      { id: 'admin', label: 'Admin', icon: Crown }
+    ] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -70,6 +75,10 @@ function AppContent() {
         return <SessionNotes />;
       case 'communications':
         return <CommunicationHub userClearance={user.clearanceLevel} />;
+      case 'approvals':
+        return <LoreApprovalQueue />;
+      case 'admin':
+        return <AdminDashboard />;
       case 'settings':
         return (
           <div className="space-y-6">

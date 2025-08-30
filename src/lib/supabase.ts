@@ -128,6 +128,9 @@ export interface LoreEntry {
   notable: string[];
   warnings: string[];
   restricted?: string;
+  is_approved: boolean;
+  submitted_by: string;
+  approved_by?: string;
   created_at: string;
   updated_at: string;
 }
