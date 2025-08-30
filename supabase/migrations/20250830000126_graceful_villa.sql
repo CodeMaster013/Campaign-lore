@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS lore_entries (
   updated_at timestamptz DEFAULT now()
 );
 
+-- Enable row-level security (RLS)
 ALTER TABLE lore_entries ENABLE ROW LEVEL SECURITY;
 
 -- Users can read approved entries based on their clearance level
@@ -129,6 +130,10 @@ CREATE POLICY "Admins can manage all lore entries"
   );
 
 -- Add constraints
+-- The fix: DROP the constraint if it already exists before adding it.
+ALTER TABLE lore_entries 
+DROP CONSTRAINT IF EXISTS lore_entries_clearance_level_check;
+
 ALTER TABLE lore_entries 
 ADD CONSTRAINT lore_entries_clearance_level_check 
 CHECK (clearance_level = ANY(ARRAY['Beta', 'Alpha', 'Omega']));
