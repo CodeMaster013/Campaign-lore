@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText, Menu, X } from 'lucide-react';
+import { Terminal, Database, Home, Settings, User, LogOut, Crown, Target, Star, Users, MessageSquare, FileText, Menu, X, AlertTriangle } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
 import { Dashboard } from './components/Dashboard';
@@ -12,9 +12,8 @@ import { StarMap } from './components/StarMap';
 import { NPCDatabase } from './components/NPCDatabase';
 import { SessionNotes } from './components/SessionNotes';
 import { CommunicationHub } from './components/CommunicationHub';
-import { AdminDashboard } from './components/AdminDashboard';
 
-type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'approvals' | 'admin' | 'settings';
+type View = 'dashboard' | 'database' | 'terminal' | 'missions' | 'starmap' | 'npcs' | 'sessions' | 'communications' | 'approvals' | 'settings';
 
 function AppContent() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -48,7 +47,6 @@ function AppContent() {
     ...(user.role === 'admin' ? [
       { id: 'sessions', label: 'Sessions', icon: FileText },
       { id: 'approvals', label: 'Approvals', icon: AlertTriangle },
-      { id: 'admin', label: 'Admin', icon: Crown }
     ] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
@@ -77,8 +75,6 @@ function AppContent() {
         return <CommunicationHub userClearance={user.clearanceLevel} />;
       case 'approvals':
         return <LoreApprovalQueue />;
-      case 'admin':
-        return <AdminDashboard />;
       case 'settings':
         return (
           <div className="space-y-6">
