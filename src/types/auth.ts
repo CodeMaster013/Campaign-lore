@@ -1,12 +1,15 @@
 export interface User {
   id: string;
   username: string;
-  displayName: string;
-  clearanceLevel: 'Beta' | 'Alpha' | 'Omega';
+  display_name: string;
+  email?: string;
+  clearance_level: 'Beta' | 'Alpha' | 'Omega';
   role: 'player' | 'admin';
   avatar?: string;
-  joinDate: string;
-  lastActive: string;
+  join_date: string;
+  last_active: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 export interface AuthState {

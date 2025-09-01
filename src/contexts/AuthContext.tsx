@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { User, AuthState } from '../types/auth';
 
 interface AuthContextType extends AuthState {
@@ -9,58 +11,50 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user database - in a real app, this would be in a backend
-const mockUsers: Record<string, { password: string; user: User }> = {
+// Mock credentials for demo purposes
+const mockCredentials: Record<string, { email: string; password: string; userData: Partial<User> }> = {
   'founder': {
+    email: 'founder@theseus.com',
     password: 'omega-prime-2024',
-    user: {
-      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    userData: {
       username: 'founder',
-      displayName: 'The Founder',
-      clearanceLevel: 'Omega',
+      display_name: 'The Founder',
+      clearance_level: 'Omega',
       role: 'admin',
-      avatar: '👑',
-      joinDate: '2024-01-01',
-      lastActive: new Date().toISOString()
+      avatar: '👑'
     }
   },
   'operative-alpha': {
+    email: 'alpha@theseus.com',
     password: 'alpha-clearance',
-    user: {
-      id: 'b1ffcc88-8d1a-3ff7-aa5c-5aa8ac270b22',
+    userData: {
       username: 'operative-alpha',
-      displayName: 'Agent Mitchell',
-      clearanceLevel: 'Alpha',
+      display_name: 'Agent Mitchell',
+      clearance_level: 'Alpha',
       role: 'player',
-      avatar: '🚀',
-      joinDate: '2024-01-15',
-      lastActive: new Date().toISOString()
+      avatar: '🚀'
     }
   },
   'operative-beta': {
+    email: 'beta@theseus.com',
     password: 'beta-access',
-    user: {
-      id: 'c2ddbb77-7e2b-2ee6-bb4b-4bb7bc160c33',
+    userData: {
       username: 'operative-beta',
-      displayName: 'Operative Chen',
-      clearanceLevel: 'Beta',
+      display_name: 'Operative Chen',
+      clearance_level: 'Beta',
       role: 'player',
-      avatar: '⭐',
-      joinDate: '2024-01-20',
-      lastActive: new Date().toISOString()
+      avatar: '⭐'
     }
   },
   'recruit': {
+    email: 'recruit@theseus.com',
     password: 'new-recruit',
-    user: {
-      id: 'd3eeaa66-6f3c-1dd5-cc3a-3cc6cb050d44',
+    userData: {
       username: 'recruit',
-      displayName: 'Recruit Davis',
-      clearanceLevel: 'Beta',
+      display_name: 'Recruit Davis',
+      clearance_level: 'Beta',
       role: 'player',
-      avatar: '🔰',
-      joinDate: '2024-02-01',
-      lastActive: new Date().toISOString()
+      avatar: '🔰'
     }
   }
 };
@@ -73,60 +67,167 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Check for stored session
-    const storedUser = localStorage.getItem('theseus-user');
-    if (storedUser) {
+    // Check for existing Supabase session
+    const checkSession = async () => {
       try {
-        const user = JSON.parse(storedUser);
-        setAuthState({
-          user,
-          isAuthenticated: true,
-          isLoading: false
-        });
-      } catch {
-        localStorage.removeItem('theseus-user');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await loadUserProfile(session.user);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+      } finally {
         setAuthState(prev => ({ ...prev, isLoading: false }));
       }
-    } else {
-      setAuthState(prev => ({ ...prev, isLoading: false }));
-    }
+    };
+
+    checkSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await loadUserProfile(session.user);
+      } else {
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    const userRecord = mockUsers[username.toLowerCase()];
-    
-    if (userRecord && userRecord.password === password) {
-      const user = {
-        ...userRecord.user,
-        lastActive: new Date().toISOString()
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      // Try to get user from database
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      const user: User = userData || {
+        id: supabaseUser.id,
+        username: supabaseUser.email?.split('@')[0] || 'user',
+        display_name: supabaseUser.email?.split('@')[0] || 'User',
+        email: supabaseUser.email,
+        clearance_level: 'Beta',
+        role: 'player',
+        avatar: '👤',
+        join_date: new Date().toISOString(),
+        last_active: new Date().toISOString(),
+        is_active: true,
+        created_at: new Date().toISOString()
       };
-      
+
       setAuthState({
         user,
         isAuthenticated: true,
         isLoading: false
       });
-      
-      localStorage.setItem('theseus-user', JSON.stringify(user));
-      return true;
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+      setAuthState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false
+      });
     }
-    
-    return false;
   };
 
-  const logout = () => {
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const credentials = mockCredentials[username.toLowerCase()];
+      if (!credentials) {
+        return false;
+      }
+
+      // Sign in with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password
+      });
+
+      if (error) {
+        // If user doesn't exist, create them
+        if (error.message.includes('Invalid login credentials')) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: credentials.email,
+            password: credentials.password
+          });
+
+          if (signUpError) {
+            console.error('Sign up failed:', signUpError);
+            return false;
+          }
+
+          if (signUpData.user) {
+            // Create user profile in database
+            const { error: profileError } = await supabase
+              .from('users')
+              .insert([{
+                id: signUpData.user.id,
+                ...credentials.userData,
+                email: credentials.email
+              }]);
+
+            if (profileError) {
+              console.error('Profile creation failed:', profileError);
+            }
+
+            await loadUserProfile(signUpData.user);
+            return true;
+          }
+        }
+        return false;
+      }
+
+      if (data.user) {
+        await loadUserProfile(data.user);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+    
     setAuthState({
       user: null,
       isAuthenticated: false,
       isLoading: false
     });
-    localStorage.removeItem('theseus-user');
   };
 
-  const updateUserClearance = (userId: string, clearance: 'Beta' | 'Alpha' | 'Omega') => {
+  const updateUserClearance = async (userId: string, clearance: 'Beta' | 'Alpha' | 'Omega') => {
     if (authState.user?.role === 'admin') {
-      // In a real app, this would update the backend
-      console.log(`Updated user ${userId} clearance to ${clearance}`);
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ clearance_level: clearance })
+          .eq('id', userId);
+
+        if (error) {
+          console.error('Failed to update clearance:', error);
+        }
+      } catch (error) {
+        console.error('Clearance update failed:', error);
+      }
     }
   };
 
