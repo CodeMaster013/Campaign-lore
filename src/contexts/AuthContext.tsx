@@ -168,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
 
           if (signUpData.user) {
-            // Create user profile in database
+            // Create user profile in database using service role
             const { error: profileError } = await supabase
               .from('users')
               .insert([{
@@ -215,19 +215,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUserClearance = async (userId: string, clearance: 'Beta' | 'Alpha' | 'Omega') => {
-    if (authState.user?.role === 'admin') {
-      try {
-        const { error } = await supabase
-          .from('users')
-          .update({ clearance_level: clearance })
-          .eq('id', userId);
+    // Only allow if current user is admin
+    if (authState.user?.role !== 'admin') {
+      console.error('Unauthorized: Only admins can update clearance');
+      return;
+    }
 
-        if (error) {
-          console.error('Failed to update clearance:', error);
-        }
-      } catch (error) {
-        console.error('Clearance update failed:', error);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ clearance_level: clearance })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Failed to update clearance:', error);
       }
+    } catch (error) {
+      console.error('Clearance update failed:', error);
     }
   };
 
