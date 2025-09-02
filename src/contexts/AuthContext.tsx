@@ -73,11 +73,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           await loadUserProfile(session.user);
+        } else {
+          // No session found, set loading to false
+          setAuthState(prev => ({ ...prev, isLoading: false }));
         }
       } catch (error) {
         console.error('Session check failed:', error);
+        // On error, also set loading to false so user can see login screen
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false
+        });
       } finally {
-        setAuthState(prev => ({ ...prev, isLoading: false }));
+        // Ensure loading is always set to false
+        setTimeout(() => {
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+        }, 100);
       }
     };
 
@@ -109,7 +121,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        throw error;
+        console.error('Database error:', error);
+        // If database error, create a fallback user profile
+        const fallbackUser: User = {
+          id: supabaseUser.id,
+          username: supabaseUser.email?.split('@')[0] || 'user',
+          display_name: supabaseUser.email?.split('@')[0] || 'User',
+          email: supabaseUser.email,
+          clearance_level: 'Beta',
+          role: 'player',
+          avatar: '👤',
+          join_date: new Date().toISOString(),
+          last_active: new Date().toISOString(),
+          is_active: true,
+          created_at: new Date().toISOString()
+        };
+        
+        setAuthState({
+          user: fallbackUser,
+          isAuthenticated: true,
+          isLoading: false
+        });
+        return;
       }
 
       const user: User = userData || {
