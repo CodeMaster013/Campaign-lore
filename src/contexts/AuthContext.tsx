@@ -67,36 +67,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Check for existing Supabase session
-    const checkSession = async () => {
+    console.log('AuthProvider: Starting initialization');
+    
+    // Simple timeout to ensure we don't stay in loading forever
+    const loadingTimeout = setTimeout(() => {
+      console.log('AuthProvider: Loading timeout reached, setting loading to false');
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+    }, 3000);
+
+    const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log('AuthProvider: Checking session');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.log('AuthProvider: Session error:', error);
+          throw error;
+        }
+
         if (session?.user) {
+          console.log('AuthProvider: Found session, loading user profile');
           await loadUserProfile(session.user);
         } else {
-          // No session found, set loading to false
-          setAuthState(prev => ({ ...prev, isLoading: false }));
+          console.log('AuthProvider: No session found');
+          setAuthState({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false
+          });
         }
       } catch (error) {
-        console.error('Session check failed:', error);
-        // On error, also set loading to false so user can see login screen
+        console.error('AuthProvider: Init failed:', error);
         setAuthState({
           user: null,
           isAuthenticated: false,
           isLoading: false
         });
       } finally {
-        // Ensure loading is always set to false
-        setTimeout(() => {
-          setAuthState(prev => ({ ...prev, isLoading: false }));
-        }, 100);
+        clearTimeout(loadingTimeout);
       }
     };
 
-    checkSession();
+    initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('AuthProvider: Auth state changed:', event);
       if (session?.user) {
         await loadUserProfile(session.user);
       } else {
@@ -108,11 +124,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log('AuthProvider: Loading user profile for:', supabaseUser.id);
+      
       // Try to get user from database
       const { data: userData, error } = await supabase
         .from('users')
@@ -120,9 +141,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', supabaseUser.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Database error:', error);
-        // If database error, create a fallback user profile
+      if (error) {
+        console.log('AuthProvider: Database query error:', error);
+        // Create fallback user
         const fallbackUser: User = {
           id: supabaseUser.id,
           username: supabaseUser.email?.split('@')[0] || 'user',
@@ -137,6 +158,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           created_at: new Date().toISOString()
         };
         
+        console.log('AuthProvider: Using fallback user');
         setAuthState({
           user: fallbackUser,
           isAuthenticated: true,
@@ -145,27 +167,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      const user: User = userData || {
-        id: supabaseUser.id,
-        username: supabaseUser.email?.split('@')[0] || 'user',
-        display_name: supabaseUser.email?.split('@')[0] || 'User',
-        email: supabaseUser.email,
-        clearance_level: 'Beta',
-        role: 'player',
-        avatar: '👤',
-        join_date: new Date().toISOString(),
-        last_active: new Date().toISOString(),
-        is_active: true,
-        created_at: new Date().toISOString()
-      };
-
+      const user: User = userData;
+      console.log('AuthProvider: User profile loaded successfully');
+      
       setAuthState({
         user,
         isAuthenticated: true,
         isLoading: false
       });
     } catch (error) {
-      console.error('Failed to load user profile:', error);
+      console.error('AuthProvider: Failed to load user profile:', error);
       setAuthState({
         user: null,
         isAuthenticated: false,
@@ -176,8 +187,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
+      console.log('AuthProvider: Attempting login for:', username);
+      
       const credentials = mockCredentials[username.toLowerCase()];
       if (!credentials) {
+        console.log('AuthProvider: No credentials found for username');
         return false;
       }
 
@@ -188,30 +202,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        console.log('AuthProvider: Sign in error:', error);
+        
         // If user doesn't exist, create them
         if (error.message.includes('Invalid login credentials')) {
+          console.log('AuthProvider: Creating new user account');
+          
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: credentials.email,
             password: credentials.password
           });
 
           if (signUpError) {
-            console.error('Sign up failed:', signUpError);
+            console.error('AuthProvider: Sign up failed:', signUpError);
             return false;
           }
 
           if (signUpData.user) {
-            // Create user profile in database using service role
-            const { error: profileError } = await supabase
-              .from('users')
-              .insert([{
-                id: signUpData.user.id,
-                ...credentials.userData,
-                email: credentials.email
-              }]);
+            console.log('AuthProvider: User created, creating profile');
+            
+            // Create user profile in database
+            try {
+              const { error: profileError } = await supabase
+                .from('users')
+                .insert([{
+                  id: signUpData.user.id,
+                  ...credentials.userData,
+                  email: credentials.email
+                }]);
 
-            if (profileError) {
-              console.error('Profile creation failed:', profileError);
+              if (profileError) {
+                console.log('AuthProvider: Profile creation error:', profileError);
+              }
+            } catch (profileError) {
+              console.log('AuthProvider: Profile creation failed:', profileError);
             }
 
             await loadUserProfile(signUpData.user);
@@ -222,13 +246,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.user) {
+        console.log('AuthProvider: Sign in successful');
         await loadUserProfile(data.user);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('AuthProvider: Login failed:', error);
       return false;
     }
   };
@@ -237,7 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('AuthProvider: Logout failed:', error);
     }
     
     setAuthState({
@@ -267,6 +292,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Clearance update failed:', error);
     }
   };
+
+  console.log('AuthProvider: Current state:', authState);
 
   return (
     <AuthContext.Provider value={{
