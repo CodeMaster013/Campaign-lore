@@ -139,31 +139,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('users')
         .select('*')
         .eq('id', supabaseUser.id)
-        .single();
+        .maybeSingle();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.log('AuthProvider: Database query error:', error);
-        // Create fallback user
+      }
+
+      if (!userData) {
+        console.log('AuthProvider: No user profile found, creating fallback user');
+        
+        // Find the correct clearance from mock credentials based on email
+        let correctClearance = 'Beta';
+        let correctUserData = {};
+        
+        for (const [username, creds] of Object.entries(mockCredentials)) {
+          if (creds.email === supabaseUser.email) {
+            correctClearance = creds.userData.clearance_level || 'Beta';
+            correctUserData = creds.userData;
+            break;
+          }
+        }
+        
         const fallbackUser: User = {
           id: supabaseUser.id,
-          username: supabaseUser.email?.split('@')[0] || 'user',
-          display_name: supabaseUser.email?.split('@')[0] || 'User',
+          username: (correctUserData as any).username || supabaseUser.email?.split('@')[0] || 'user',
+          display_name: (correctUserData as any).display_name || supabaseUser.email?.split('@')[0] || 'User',
           email: supabaseUser.email,
-          clearance_level: 'Beta',
-          role: 'player',
-          avatar: '👤',
+          clearance_level: correctClearance as 'Beta' | 'Alpha' | 'Omega',
+          role: (correctUserData as any).role || 'player',
+          avatar: (correctUserData as any).avatar || '👤',
           join_date: new Date().toISOString(),
           last_active: new Date().toISOString(),
           is_active: true,
           created_at: new Date().toISOString()
         };
         
-        console.log('AuthProvider: Using fallback user');
+        console.log('AuthProvider: Using fallback user with correct clearance:', correctClearance);
         setAuthState({
           user: fallbackUser,
           isAuthenticated: true,
           isLoading: false
         });
+        
+        // Try to create the user profile in the database for future use
+        try {
+          await supabase
+            .from('users')
+            .insert([fallbackUser]);
+          console.log('AuthProvider: User profile created in database');
+        } catch (insertError) {
+          console.log('AuthProvider: Failed to create user profile in database:', insertError);
+        }
+        
         return;
       }
 
