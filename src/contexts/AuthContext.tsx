@@ -222,11 +222,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
+      // Check if the entered password matches the expected password
+      if (password !== credentials.password) {
+        console.log('AuthProvider: Password mismatch');
+        return false;
+      }
+
       // Try to sign in first
       console.log('AuthProvider: Attempting sign in with email:', credentials.email);
       let { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
-        password: password // Use the actual password entered, not the stored one
+        password: credentials.password // Use the stored password for Supabase auth
       });
 
       if (error) {
@@ -238,7 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           const signUpResult = await supabase.auth.signUp({
             email: credentials.email,
-            password: password,
+            password: credentials.password,
             options: {
               emailRedirectTo: undefined // Disable email confirmation
             }
