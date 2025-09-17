@@ -56,10 +56,9 @@ The included lore database features entries such as:
 > Note: This project is under development and may not include all features yet. For details or to see more files, check the [GitHub repository file browser](https://github.com/CodeMaster013/Campaign-lore)
 
 ## Contributors
-I thank all contributors who help us improve and fix my project
+I thank all contributors who help me improve and fix my project
 
 Contributors include:
+- **Sehnya**
 
-@CodeMaster013
-
-@Sehnya
+And once again, Thanks!
