@@ -59,3 +59,5 @@ The included lore database features entries such as:
 I thank all contributors who help us improve and fix my project
 
 Contributors include:
+@CodeMaster013
+@Sehnya
