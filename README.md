@@ -1,6 +1,6 @@
 # Campaign-lore
 
-Campaign-lore is a web application for organizing, exploring, and managing the lore and worldbuilding of a sci-fi tabletop DND world. The app provides a beautiful, production-ready interface for both players and game masters to interact with campaign lore, missions, star systems, NPCs, and more, with features for managing user authentication, access control, and collaborative content creation.
+Campaign-lore is a web application for organizing, exploring, and managing the lore and worldbuilding of a sci-fi tabletop DND world. The app provides a beautiful, production-ready interface for both players and game masters to interact with campaign lore, missions, star systems, NPCs, and more, with features for managing user authentication, access control, and collaborative content creation
 
 ## Features
 
@@ -54,6 +54,14 @@ The included lore database features entries such as:
 - Run the app with your preferred development server (e.g., Vite).
 
 > Note: This project is under development and may not include all features yet. For details or to see more files, check the [GitHub repository file browser](https://github.com/CodeMaster013/Campaign-lore)
+
+## Bugs, Suggestions, And Improvements
+If you have or find any
+- Bugs
+- Suggestions,
+- Possible improvements
+
+Please open a report in the Issues tab and if you want to do it, open a report and open a PR with your improved version. I would love to integrate your feedback and improvements!
 
 ## Contributors
 I thank all contributors who help me improve and fix my project
