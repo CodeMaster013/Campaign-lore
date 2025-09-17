@@ -1,16 +1,65 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const demoMode = (import.meta as any).env?.VITE_DEMO_AUTH === 'true';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-// Fallback for development/demo mode
-const defaultUrl = 'https://demo.supabase.co';
-const defaultKey = 'demo-key';
+// Enforce explicit configuration to avoid accidental use of an invalid project
+if (!supabaseUrl || !supabaseAnonKey) {
+  if (!demoMode) {
+    // Provide a clear runtime error with guidance
+    // Note: Vite only exposes variables prefixed with VITE_
+    throw new Error(
+      'Supabase configuration missing: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY are not set. ' +
+      'Set these env vars in your Vite environment (e.g., .env.local) and on your hosting platform.'
+    );
+  }
+}
 
-export const supabase = createClient(
-  supabaseUrl || defaultUrl, 
-  supabaseAnonKey || defaultKey
-);
+function createDemoSupabase() {
+  // Very small mock implementing methods we use in the app
+  const auth = {
+    async getSession() {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem('demo_session') : null;
+      const session = raw ? JSON.parse(raw) : null;
+      return { data: { session }, error: null } as any;
+    },
+    onAuthStateChange(_cb: any) {
+      // No-op subscription in demo mode
+      return { data: { subscription: { unsubscribe() {} } } } as any;
+    },
+    async signInWithPassword() {
+      // Not used in demo mode path; return a predictable error if called
+      return { data: { user: null, session: null }, error: { message: 'DEMO_MODE_NO_REMOTE_AUTH' } } as any;
+    },
+    async signOut() {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('demo_session');
+      }
+      return { error: null } as any;
+    }
+  };
+
+  const fromHandler = () => ({
+    select() { return this; },
+    eq() { return this; },
+    async maybeSingle() { return { data: null, error: { code: 'PGRST116', message: 'No rows' } } as any; },
+    async insert() { return { data: null, error: null } as any; },
+    async update() { return { data: null, error: null } as any; }
+  });
+
+  return { auth, from: (_: string) => fromHandler() } as any;
+}
+
+export const supabase = demoMode
+  ? createDemoSupabase()
+  : createClient(supabaseUrl as string, supabaseAnonKey as string, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
 
 // Database types
 export interface User {
