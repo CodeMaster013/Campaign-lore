@@ -47,13 +47,20 @@ function createDemoSupabase() {
     not() { return this; },
     is() { return this; },
     order() { return this; },
+    limit() { return this; },
+    single() { return this; },
     async maybeSingle() { return { data: null, error: { code: 'PGRST116', message: 'No rows' } } as any; },
     async insert() { return { data: null, error: null } as any; },
     async update() { return { data: null, error: null } as any; },
+    async delete() { return { data: null, error: null } as any; },
     // Add the missing async method that returns data
     then(resolve: any) {
       // This makes the query builder thenable, allowing it to be awaited
       resolve({ data: [], error: null });
+      return this;
+    },
+    catch(reject: any) {
+      // Add catch method for promise compatibility
       return this;
     }
   });
