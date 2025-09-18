@@ -43,12 +43,35 @@ function createDemoSupabase() {
   const fromHandler = () => ({
     select() { return this; },
     eq() { return this; },
+    neq() { return this; },
+    not() { return this; },
+    is() { return this; },
+    order() { return this; },
     async maybeSingle() { return { data: null, error: { code: 'PGRST116', message: 'No rows' } } as any; },
     async insert() { return { data: null, error: null } as any; },
-    async update() { return { data: null, error: null } as any; }
+    async update() { return { data: null, error: null } as any; },
+    // Add the missing async method that returns data
+    then(resolve: any) {
+      // This makes the query builder thenable, allowing it to be awaited
+      resolve({ data: [], error: null });
+      return this;
+    }
   });
 
-  return { auth, from: (_: string) => fromHandler() } as any;
+  const channel = () => ({
+    on() { return this; },
+    subscribe() { 
+      return { 
+        unsubscribe() {} 
+      }; 
+    }
+  });
+
+  return { 
+    auth, 
+    from: (_: string) => fromHandler(),
+    channel: (_: string) => channel()
+  } as any;
 }
 
 export const supabase = demoMode
